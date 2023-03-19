@@ -23,7 +23,7 @@ using namespace std;
 
 
 std::vector<std::vector<double>> parser_eff_tb(std::vector<std::string> theData){
-	printVector(theData);
+	//printVector(theData);
 	std::vector<double> effV;
 	std::vector<double> uncV_p;//plus
 	std::vector<double> uncV_m;//minus
@@ -46,6 +46,7 @@ std::vector<std::vector<double>> parser_eff_tb(std::vector<std::string> theData)
 TGraphAsymmErrors* makeTGasymm(std::vector<double> Xvec, std::vector<std::string> effAndUnc, std::string g_name){
 	TGraphAsymmErrors* gr = new TGraphAsymmErrors;
 	std::vector<std::vector<double>> YandUncs=parser_eff_tb(effAndUnc);
+	printVectorVector(YandUncs);
 	int n=Xvec.size();
 	//gr=TGraphAsymmErrors(n,Xvec,YandUncs[0],eyl,eyh);
 	for (int j=0;j<n;j++){
@@ -79,76 +80,126 @@ void tb_plot_eff(){
 
 	canOptions canOpts;
 	canOpts.colours=cVec; canOpts.markers=mVec;
-	canOpts.setValues(1, -12, 0, 110, "eff_vs_thres", "Threshold [e]", "Efficiency [%]", "ap", 900, 600);
-	//canOpts.setValues(1, -12, 0, 110, "eff_vs_V", "Voltage [V]", "Efficiency [%]", "ap", 900, 600);
+	canOpts.setValues(1, -12, 0, 110, "eff_vs_V", "Voltage [V]", "Efficiency [%]", "ap", 900, 600);
 	canOpts.inputFolder="/Users/ytian/hardware/2021_testBeam/analysis/";
-	canOpts.outputFolder="/Users/ytian/hardware/2021_testBeam/analysis/";
+	canOpts.outputFolder="./output_tb/";
 	std::vector<std::string> fileNameVec={};
 	std::vector<std::string> legNameVec={};
-	canOpts.figFileName={"figFileName"};
+	canOpts.figFileName="figFileName";
 	canOpts.figFileFormats={"pdf"};//figure file name
+	TCanvas* c1; TPad* pad0; TPad* pad1; canOpts.TPads={pad0,pad1};
+	std::vector<std::vector<std::vector<std::string>>> allData;
+	std::vector<std::vector<std::vector<double>>> allXYvecs;
+	std::vector<int> indices;
 
 	canOpts.factorsX={1.}; canOpts.factorsY={1.};
-
 	canOpts.indexRow=0;// index of the row below which data starts
 	canOpts.indexColX=1;
 	canOpts.indexColY=2;
-
+	//canOpts.indexColXunc=-1;
+	//canOpts.indexColYunc=-1;
 	canOpts.plotType="eff";
-	canOpts.title="eff_vs_v";
 	canOpts.markerSizes[0]=1.25; canOpts.markerSizes.push_back(1.25);
 	canOpts.marginT=0.1; canOpts.marginB=0.1; canOpts.marginL=0.13; canOpts.marginR=0.07; canOpts.xLabelSize=0.035;
 
 
+	canOpts.setValues(0, 5500, 86, 100, "eff_vs_thres", "Threshold [e]", "Efficiency [%]", "ap", 900, 600);
+	canOpts.figFileName="2023-1_eff_SCC4_vsThres";
 	//auto c1 = new TCanvas("c1","A Simple Graph with asymmetric error bars",200,10,700,500);
 	//c1->SetGrid();
-	TCanvas* c1; TPad* pad0; TPad* pad1;
-	c1=initCan(canOpts, pad0, pad1);
-	pad0->SetFillStyle(4000);
-	pad1->SetFillStyle(4000);
 	TLegend* canLeg=new TLegend(0.72,0.05,1.0,0.95);
+	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);
+	canOpts.TPads[0]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetFillStyle(4000);
 
 	std::vector<double> eyl;
 	std::vector<double> eyh;
 
-	//std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10.txt");
-	//std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_alighWmask_analysisWmask.txt");
-	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10_thres.txt");
-	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_thres_minH6.txt");
 
-	int i=0;
+	/*
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10_2023-1_thres.txt");
+	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
+	std::vector<std::string> effAndUnc=get1row(allData_f1,4,0);
+	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_thres_minH6.txt");
+	std::vector<double> Xvec2=getData_vector(allData_f1,1,0);
+	std::vector<std::string> effAndUnc2=get1row(allData_f1,3,0);
+	printVector(Xvec,"Xvec: ");
+	printVector(Xvec2,"Xvec2: ");
+	printVector(effAndUnc,"effAndUnc: ");
+	printVector(effAndUnc2,"effAndUnc2: ");
 
 	std::vector<TGraphAsymmErrors*> allTGasymms;
-	std::vector<double> Xvec=getDataVector(allData_f1,1,0);
-	std::vector<std::string> effAndUnc=get1row(allData_f1,2,0);
-	allTGasymms.push_back(makeTGasymm(Xvec, effAndUnc, "SCC4"));
-	canLeg->AddEntry(allTGasymms[i],"SCC4","lp same");
+	int i=0;
+
+	allTGasymms.push_back(makeTGasymm(Xvec2, effAndUnc2, "SCC4"));
+	canLeg->AddEntry(allTGasymms[i],"SCC4","p same");
 
 	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
 	allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
 	allTGasymms[i]->GetXaxis()->SetTitle("Threshold [e]");
 	allTGasymms[i]->GetYaxis()->SetTitle("Efficiency [%]");
-	allTGasymms[i]->Draw("ALP same");//RX reverses x axis
-	//allTGasymms[i]->Draw("ALP RX same");//RX reverses x axis
+	allTGasymms[i]->Draw("LP SAME");//RX reverses x axis
+	
+	i=1;
+	allTGasymms.push_back(makeTGasymm(Xvec, effAndUnc, "min_hits_on_track=5"));
+	canLeg->AddEntry(allTGasymms[i],"min_hits_on_track=5","p SAME");
+
+	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
+	allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
+	allTGasymms[i]->Draw("LP SAME");//RX reverses x axis
+	*/
+
+
+
+
+	canOpts.setValues(0.5, -50.5, 96, 99, "eff_vs_V", "Voltage [V]", "Efficiency [%]", "ap", 900, 600);
+	canOpts.figFileName="2023-1_eff_SCC4_wMask97runs";
+	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1], "ALP RX");
+	canOpts.TPads[0]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetGrid(0,0);
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10.txt");
+	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
+	std::vector<std::string> effAndUnc=get1row(allData_f1,2,0);
+	//std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_alighWmask_analysisWmask.txt");
+	//std::vector<double> Xvec2=getData_vector(allData_f2,1,0);
+	//std::vector<std::string> effAndUnc2=get1row(allData_f2,2,0);
+	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2023-1_Nov2022_SCC4_mask97runs.txt");
+	std::vector<double> Xvec2=getData_vector(allData_f2,1,0);
+	std::vector<std::string> effAndUnc2=get1row(allData_f2,2,0);
+	printVector(Xvec,"Xvec: ");
+	printVector(Xvec2,"Xvec2: ");
+	printVector(effAndUnc,"effAndUnc: ");
+	printVector(effAndUnc2,"effAndUnc2: ");
+
+	std::vector<TGraphAsymmErrors*> allTGasymms;
+	int i=0;
+
+	allTGasymms.push_back(makeTGasymm(Xvec2, effAndUnc2, "SCC4"));
+	canLeg->AddEntry(allTGasymms[i],"SCC4","p same");
+
+	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
+	allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
+	allTGasymms[i]->GetXaxis()->SetTitle("Voltage [V]");
+	allTGasymms[i]->GetYaxis()->SetTitle("Efficiency [%]");
+	allTGasymms[i]->Draw("LP RX SAME");//RX reverses x axis
 	//aGraph=makeTGraphErrors(XYvec,gOptions)
 	
 	i=1;
-	std::vector<double> Xvec2=getDataVector(allData_f2,1,0);
-	std::vector<std::string> effAndUnc2=get1row(allData_f2,2,0);
-	allTGasymms.push_back(makeTGasymm(Xvec2, effAndUnc2, "min_hits_on_track=6"));
-	canLeg->AddEntry(allTGasymms[i],"min_hits_on_track=6","lp SAME");
+	allTGasymms.push_back(makeTGasymm(Xvec, effAndUnc, "SCC4_wo_mask"));
+	canLeg->AddEntry(allTGasymms[i],"SCC4_wo_mask","p SAME");
 	//allTGasymms.push_back(makeTGasymm(Xvec2, effAndUnc2, "SCC4_with_mask"));
 	//canLeg->AddEntry(allTGasymms[i],"SCC4_with_mask","lp SAME");
 
 	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
 	allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
-	allTGasymms[i]->Draw("lp SAME");//RX reverses x axis
-	//allTGasymms[i]->Draw("rx lp SAME");//RX reverses x axis
+	allTGasymms[i]->Draw("LP RX SAME");//RX reverses x axis
 	//aGraph=makeTGraphErrors(XYvec,gOptions)
-
-	drawLegend(c1, canLeg, pad0);
-	c1->Print("2022-10-17_eff_SCC4_vsThres.pdf");
-	//c1->Print("2022-10-17_eff_SCC4_Wmask.pdf");
+	//putGraphsOnCanvas(c1,allTGasymms,canOpts.TPads[1]);
 
 
+	drawLegend(c1, canLeg, canOpts.TPads[0]);
+	//c1->Print("./2023-1_eff_SCC4_vsThres.pdf");
+	//c1->Print(canOpts.figFileName+".pdf");
+	saveCan(c1, canOpts);
 }

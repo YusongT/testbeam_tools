@@ -1,3 +1,4 @@
+#input run numbers as list, print string used to insert to filename
 #runNumList=[2476, 2478, 2479, [2483, 2489], [2491, 2496], 2498, 2499]
 #pathPrefix="/eos/atlas/atlascerngroupdisk/pixel-upgrade/itk/BeamTest/cern_2022_april_itk_sps/native/run00"
 #runNumList=[2732,2733,[2736,2744],2747,2748,[2750,2754]]
@@ -9,7 +10,7 @@ runNumList=[
 [2669,2673],2675,[2677,2680],[2708,2713],[2719,2730]#1500e
 ]
 pathPrefix="/eos/atlas/atlascerngroupdisk/pixel-upgrade/itk/BeamTest/cern_2022_june_itk/native/run00"
-'''
+#46 runs
 runNumList=[
 6219, 6222, 6232, 6237, 6240, 6241, 6251, 6252,
 6315, 6331, 6339, 6345, [6347,6350],
@@ -19,7 +20,28 @@ runNumList=[
 [6375,6378],
 6380, 6383, 6384, 6386,
 ]
-pathPrefix="/eos/atlas/atlascerngroupdisk/pixel-upgrade/itk/BeamTest/20220928.cern.itk/raw/run00"
+runNumList=[
+#7487,7488,[7490,7495],7497,7498,7521,7523,7524,7534,7536,7540,7542
+#[7790,7798],[7800,7803]
+]
+'''
+runNumList=[
+6219, 6222, 6232, 6237, 6240, 6241, 6251, 6252, #0V 1ke
+6315, 6331, 6339, 6345, [6347,6350], #1V 1ke
+[6352,6359], #2V 1ke
+[6360,6367], #3V 1ke
+[6368,6373], #4V 1ke
+[6375,6378], 6383, 6384, #6V 1ke
+6380, 6386, #8V 1ke
+6389, 6391, [6398,6400], 6402, 6405, 6407, 6409, #10V 1ke
+[6754,6764], [6766,6769], #15V 1ke
+[6777,6782], #20V 1ke
+[6784,6795], #30V 1ke
+[6797,6801], #40V 1ke
+[6804,6807], #50V 1ke
+]
+#pathPrefix="/eos/atlas/atlascerngroupdisk/pixel-upgrade/itk/BeamTest/20220928.cern.itk/raw/run00"
+pathPrefix="/eos/atlas/atlascerngroupdisk/pixel-upgrade/itk/BeamTest/20221102.cern.itk/raw/run00"
 pathSuffix=".raw"
 runs=[]
 for i in range(len(runNumList)):
