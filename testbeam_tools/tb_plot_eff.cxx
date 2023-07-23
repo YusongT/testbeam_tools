@@ -152,6 +152,7 @@ void tb_plot_eff(){
 
 
 
+	/*
 	canOpts.setValues(0.5, -50.5, 96, 99, "eff_vs_V", "Voltage [V]", "Efficiency [%]", "ap", 900, 600);
 	canOpts.figFileName="2023-1_eff_SCC4_wMask97runs";
 	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1], "ALP RX");
@@ -196,10 +197,89 @@ void tb_plot_eff(){
 	allTGasymms[i]->Draw("LP RX SAME");//RX reverses x axis
 	//aGraph=makeTGraphErrors(XYvec,gOptions)
 	//putGraphsOnCanvas(c1,allTGasymms,canOpts.TPads[1]);
+	*/
 
 
+
+
+	/*
+	canOpts.inputFolder="/Users/ytian/hardware/2021_testBeam/tb_2023/";
+	canOpts.outputFolder="./output_tb/";
+
+	canOpts.setValues(0.5, -120.5, 98, 100, "eff_vs_V", "Voltage [V]", "Efficiency [%]", "ap", 900, 600);
+	canOpts.figFileName="2023-5_eff_Q9_refPl130";
+	//canOpts.figFileName="2023-5_eff_Q9";
+	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1], "ALP RX");
+	canOpts.TPads[0]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetGrid(0,0);
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-11.txt");
+	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
+	std::vector<std::string> effAndUnc=get1row(allData_f1,3,0);
+	printVector(Xvec,"Xvec: ");
+	printVector(effAndUnc,"effAndUnc: ");
+
+	std::vector<TGraphAsymmErrors*> allTGasymms;
+	int i=0;
+
+	allTGasymms.push_back(makeTGasymm(Xvec, effAndUnc, "Q9"));
+	canLeg->AddEntry(allTGasymms[i],"Q9","p same");
+
+	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
+	allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
+	allTGasymms[i]->GetXaxis()->SetTitle("Voltage [V]");
+	allTGasymms[i]->GetYaxis()->SetTitle("Efficiency [%]");
+	allTGasymms[i]->Draw("LP RX SAME");//RX reverses x axis
+	//aGraph=makeTGraphErrors(XYvec,gOptions)
+	
 	drawLegend(c1, canLeg, canOpts.TPads[0]);
 	//c1->Print("./2023-1_eff_SCC4_vsThres.pdf");
 	//c1->Print(canOpts.figFileName+".pdf");
 	saveCan(c1, canOpts);
+	*/
+
+
+	canOpts.inputFolder="/Users/ytian/code/output_tb/";
+	canOpts.outputFolder="./output_tb/";
+	//std::string inF_name="misalignment_pl24.txt";
+	std::string inF_name="misalignment_pl24.txt";
+
+	canOpts.setValues(7480, 7940, -60, 60, "misalignment", "run", "misalignment [um]", "ap", 900, 600);
+	canOpts.figFileName="2023-7_misalignment_pl24";
+	//canOpts.figFileName="2023-5_eff_Q9";
+	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1], "ALP RX");
+	canOpts.TPads[0]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetGrid(0,0);
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+inF_name);
+	std::vector<double> Xvec=getData_vector(allData_f1,0,-1);//X, Y (start with -1)
+	std::vector<double> Yvec=getData_vector(allData_f1,1,-1);//X, Y (start with -1)
+	//std::vector<std::string> effAndUnc=get1row(allData_f1,3,0);
+	printVector(Xvec,"Xvec: ");
+	printVector(Yvec,"Yvec: ");
+	std::vector<std::vector<double>> XYvecs;
+	XYvecs.push_back(Xvec); XYvecs.push_back(Yvec);
+	allXYvecs.push_back(XYvecs);
+	TGE theOptions;//theOptions.colour=1;theOptions.markerSize=1;theOptions.lineWidth=1
+	TGraphErrors* theTGraphErrors=makeTGraphErrors(XYvecs,theOptions);
+
+	std::vector<double> Xvec_2=getData_vector(allData_f1,0,-1);//X, Y (start with -1)
+	std::vector<double> Yvec_2=getData_vector(allData_f1,2,-1);//X, Y (start with -1)
+	std::vector<std::vector<double>> XYvecs_2;
+	XYvecs_2.push_back(Xvec_2); XYvecs_2.push_back(Yvec_2);
+	allXYvecs.push_back(XYvecs_2);
+	TGraphErrors* theTGraphErrors_2=makeTGraphErrors(XYvecs,theOptions);
+
+	std::vector<std::vector<std::string>> configs={{"1","1"},{"2","2"}};
+	canOpts.createTGEs(configs);
+	std::cout<<"1\n";
+	canOpts.applyOptions();
+	std::cout<<"2\n";
+	canOpts.fill_TGEs(allXYvecs, 0, 2);
+	std::cout<<"3\n";
+	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);
+	putGraphsOnCanvas(c1, canOpts.legend, canOpts.TGEs, canOpts.TPads[1], 0, 2);
+	saveCan(c1, canOpts);
+	//theTGraphErrors->Draw();
+	//printVector(effAndUnc,"effAndUnc: ");
 }
