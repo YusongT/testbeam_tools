@@ -46,7 +46,6 @@ runNumList=[
 #7487,7488,[7490,7495],7497,7498,7521,7523,7524,7534,7536,7540,7542
 #[7790,7798],[7800,7803]
 ]
-'''
 pathPrefix='/eos/atlas/atlascerngroupdisk/det-itk/general/pixels/testbeam/20221102.cern.itk/raw/run00'#2022-11 data moved here
 runNumList=[
 #100V 2ke, 17 runs
@@ -74,6 +73,23 @@ runNumList=[
 [7878,7885],[7887,7890],
 #120V 1.5ke
 [7892,7898],[7900,7902],
+]
+'''
+pathPrefix='/eos/atlas/atlascerngroupdisk/det-itk/general/pixels/testbeam/20221102.cern.itk/raw/run00'#2022-11 data moved here
+runNumList=[
+#120V 2ke
+#[7866,7875],
+#40V 2ke
+#[7818,7823],7826,7827,
+#60V 2ke
+#[7806,7809],[7811,7813],[7815,7816],
+#80V 2ke
+#[7936,7947],
+#[7790,7798],[7800,7803],
+#120V 2ke
+[7867,7875],
+#100V 1.5ke
+#[7878,7902],
 ]
 
 pathSuffix=".raw"
