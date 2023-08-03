@@ -46,9 +46,7 @@ runNumList=[
 #7487,7488,[7490,7495],7497,7498,7521,7523,7524,7534,7536,7540,7542
 #[7790,7798],[7800,7803]
 ]
-'''
 pathPrefix='/eos/atlas/atlascerngroupdisk/det-itk/general/pixels/testbeam/20221102.cern.itk/raw/run00'#2022-11 data moved here
-'''
 runNumList=[
 #100V 2ke, 17 runs
 7487,7488,[7490,7495],7497,7498,7521,7523,7524,7534,7536,7540,7542,
@@ -76,36 +74,22 @@ runNumList=[
 #120V 1.5ke
 [7892,7898],[7900,7902],
 ]
-runNumList=[
-7767,[7771,7772],[7775,7778],
-]
 '''
-
-'''
+pathPrefix='/eos/atlas/atlascerngroupdisk/det-itk/general/pixels/testbeam/20221102.cern.itk/raw/run00'#2022-11 data moved here
 runNumList=[
-#100V 2ke, the rest of the runs
-[7924,7934],
 #120V 2ke
-[7866,7875],
-#80V 2ke
-[7790,7798],[7800,7803],
-[7936,7947],
-#60V 2ke
-[7805,7809],[7811,7816],
+#[7866,7875],
 #40V 2ke
-[7818,7823],7826,7827,
-#20V 2ke
-[7829,7832],[7834,7836],
-#80V 1.5ke
-[7906,7911],
+#[7818,7823],7826,7827,
+#60V 2ke
+#[7806,7809],[7811,7813],[7815,7816],
+#80V 2ke
+#[7936,7947],
+#[7790,7798],[7800,7803],
+#120V 2ke
+[7867,7875],
 #100V 1.5ke
-[7878,7885],[7887,7890],
-#120V 1.5ke
-[7892,7898],[7900,7902],
-]
-'''
-runNumList=[
-[7936,7947]
+#[7878,7902],
 ]
 
 pathSuffix=".raw"
@@ -122,7 +106,6 @@ sep="\n"
 for aRun in runs:
 	print(str(aRun)+sep,end = '')
 print("tot # of runs:",len(runs))
-print("runs:",runs)
 
 # assemble the full names with path
 final_str=""

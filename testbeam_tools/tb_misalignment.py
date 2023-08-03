@@ -1,46 +1,25 @@
-
 from helperFunctions_Yusong import *
 
 #ROOT.gROOT.SetBatch(1)#doesn't show the graph
-
 #May need to source /opt/homebrew/bin/thisroot.sh on mac
 #root-config --python-version
 #python3.10 print_plots.py
 
+# saves the misalignment (mean of Gauss of residuals) in txt
 # ------ ------ config ------ ------
-'''
-inDir="/Users/ytian/hardware/2021_testBeam/tb_2023/reconstruction/"
-ouDir="/Users/ytian/code/output_tb/"
-
-inF_names=[
-["align_DUT_24_abs50_50.root","24_abs50"]
-]
-
-inF_paths=[
-["AlignmentDUTResidual/plane"],
-["130"],
-["/residualsX","/residualsY"],
-]
-
-pic_names=[
-["_pl"],#extra explanation
-["130"],
-["_residuals"],
-["X","Y"],
-]
-'''
-
 inDir="/Users/ytian/hardware/tb/tb_2023/misalignment_analysis/"
 ouDir="/Users/ytian/code/output_tb/"
-ouFname='misalignment_pl24.txt'
 
-runNus_24=[7490,7491,7757,7773,7774,7779,7783,7787,7790,7803,7913,7934]
-runNus_130=[7490,7491,7768,7774,7806,7816,7818,7827,7829,7836,7867,7875,7878,7902,7906,7911,7913,7934,7936,7947]
-print('#runs =',len(runNus_24)+len(runNus_130))
+#ouFname='misalignment_pl24.txt'
+#runNus=[7490,7491,7757,7773,7774,7779,7783,7787,7790,7803,7913,7934]
+#fileName_suffix='_4Dabs100100_pl24None_minH7_2023-6-26.root'
+ouFname='misalignment_pl130.txt'
+runNus=[7490,7491,7768,7774,7806,7816,7818,7827,7829,7836,7867,7875,7878,7902,7906,7911,7913,7934,7936,7947]#130
+fileName_suffix='_4Dabs100100_pl130None_minH7_2023-6-26.root'
+#print('#runs =',len(runNus)+len(runNus_130))
 fileName_prefix='analysis_run'
-fileName_suffix='_4Dabs100100_pl24None_minH7_2023-6-26.root'
 inF_names=[]
-for runNu in runNus_24:
+for runNu in runNus:
 	inF_names.append([fileName_prefix+str(runNu)+fileName_suffix,'run'+str(runNu)])
 print(inF_names)
 #inF_names=[
@@ -63,6 +42,7 @@ pic_names=[
 #["_local_","_global_"],
 ["residualsX_2","residualsY_2"],
 ]
+
 
 # ------ ------ main() ------ ------
 
@@ -92,23 +72,28 @@ for i in range(len(inF_names)):
 	inF_fullPath=addPath(inDir,inF_names[i][0])
 	print("inF_fullPath:",inF_fullPath)
 	f_inF=TFile.Open(inF_fullPath,"r")
+	print("f_inF.ls():")
 	f_inF.ls()
-	#print("h_paths1:",h_paths1)
 
+	print("h_paths1:",h_paths1,"pic_names2",pic_names2)
 	h_li=getTH1s(f_inF,ouDir,h_paths1,pic_names2,10)
 	for h in h_li:
 		# Fit histogram with root #
-		print('h.GetEntries =',h.GetEntries())
-		if h.GetEntries()!=0:
-			h.Fit('gaus')
-			# Get Root Fit and Goodness of Fit Parameters #
-			f = h.GetFunction('gaus')
-			const,mu,sigma = f.GetParameter(0), f.GetParameter(1), f.GetParameter(2)
-			econst,emu,esigma = f.GetParError(0), f.GetParError(1), f.GetParError(2)
-			ndf,chi2,prob = f.GetNDF(),f.GetChisquare(),f.GetProb()
-			print(chi2/ndf,prob)
+		if h!=None:
+			print('h.GetEntries =',h.GetEntries())
+			if h.GetEntries()!=0:
+				h.Fit('gaus')
+				# Get Root Fit and Goodness of Fit Parameters #
+				f = h.GetFunction('gaus')
+				const,mu,sigma = f.GetParameter(0), f.GetParameter(1), f.GetParameter(2)
+				econst,emu,esigma = f.GetParError(0), f.GetParError(1), f.GetParError(2)
+				ndf,chi2,prob = f.GetNDF(),f.GetChisquare(),f.GetProb()
+				print(chi2/ndf,prob)
+			else:
+				print('h is empty')
+				const=mu=sigma=-999
 		else:
-			print('empty h')
+			print('h is none')
 			const=mu=sigma=-999
 		print('const, mu, sigma =',const, mu, sigma)
 		mean_file_li.append(mu)
@@ -117,9 +102,14 @@ for i in range(len(inF_names)):
 print('all means:',mean_files_li)
 mean_files_li=changeType_list(mean_files_li,'string')
 print(mean_files_li,type(mean_files_li[0]),type(mean_files_li[0][0]),type(mean_files_li[1][0][1]))
-for i in range(len(runNus_24)):
+
+#write in file
+f = open(ouDir+ouFname, 'w')
+f.write('Mean of residual [um]\nrunNr	pl110X	pl110Y	pl130X	pl130Y\n')
+f.close()
+for i in range(len(runNus)):
 	f = open(ouDir+ouFname, 'a')
-	f.write(str(runNus_24[i])+'	')	
+	f.write(str(runNus[i])+'	')
 	saveList(mean_files_li[i],f,'	','a')
 	f.write('\n')
 #print2D(f_inF,ouDir,h_paths1,pic_names2,rebX,rebY)
