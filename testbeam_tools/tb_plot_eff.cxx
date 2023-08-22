@@ -239,18 +239,44 @@ void tb_plot_eff(){
 	*/
 
 
-	canOpts.inputFolder="/Users/ytian/code/output_tb/";
+	//canOpts.inputFolder="/Users/ytian/code/output_tb/";
+	canOpts.inputFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-8/";
 	canOpts.outputFolder="./output_tb/";
-	//std::string inF_name="misalignment_pl24.txt";
-	std::string inF_name="misalignment_pl24.txt";
-
-	canOpts.setValues(7480, 7940, -60, 60, "misalignment", "run", "misalignment [um]", "ap", 900, 600);
-	canOpts.figFileName="2023-7_misalignment_pl24";
-	//canOpts.figFileName="2023-5_eff_Q9";
+	std::vector<TString> inF_names={
+        "analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
+        "analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
+        "analysis_202211_60V2ke_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
+        "analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
+		"analysis_202211_100V2ke_f20_4Dabs100100_pl24None_minH7_2023-7-29_ChristopherAlignment.root",
+        "analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root"
+	};
+	
+	/*
+        "analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29.root";
+        "analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_lv1.root";
+        "analysis_202211_20V2ke_f20_4Dabs100100_pl24None_minH7_2023-7-29.root";
+        "analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29.root";
+        "analysis_202211_40V2ke_f20_4Dabs100100_pl24None_minH7_2023-7-29.root";
+        "analysis_202211_60V2ke_4Dabs100100_pl130None_minH7_2023-7-29.root";
+        "analysis_202211_60V2ke_4Dabs100100_pl24None_minH7_2023-7-29.root";
+        "analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29.root";
+        "analysis_202211_80V2ke_f20_4Dabs100100_pl24None_minH7_2023-7-29.root";
+		"analysis_202211_100V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29.root";
+		"analysis_202211_100V2ke_f20_4Dabs100100_pl24None_minH7_2023-7-29.root";
+		"analysis_202211_100V2ke_f20_4Dabs100100_pl24None_minH7_2023-7-29_lv1.root";
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-7-29.root";
+        "analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-7-29_lv1.root";
+        "analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl24None_minH7_2023-7-29.root";
+	*/
+	TString effPath="AnalysisITkPixQuad/plane110;1/eTotalEfficiency";
+	canOpts.setValues(10, 130, 90, 102, "eff_vs_V", "V", "eff [%]", "ap", 900, 600);
+	//canOpts.setValues(7480, 7940, -60, 60, "misalignment", "run", "misalignment [um]", "ap", 900, 600);
+	canOpts.figFileName="2023-7_eff_try";
 	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1], "ALP RX");
 	canOpts.TPads[0]->SetFillStyle(4000);
 	canOpts.TPads[1]->SetFillStyle(4000);
 	canOpts.TPads[1]->SetGrid(0,0);
+	/*
 	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+inF_name);
 	std::vector<double> Xvec=getData_vector(allData_f1,0,-1);//X, Y (start with -1)
 	std::vector<double> Yvec=getData_vector(allData_f1,1,-1);//X, Y (start with -1)
@@ -260,7 +286,9 @@ void tb_plot_eff(){
 	std::vector<std::vector<double>> XYvecs;
 	XYvecs.push_back(Xvec); XYvecs.push_back(Yvec);
 	allXYvecs.push_back(XYvecs);
+	*/
 	TGE theOptions;//theOptions.colour=1;theOptions.markerSize=1;theOptions.lineWidth=1
+	/*
 	TGraphErrors* theTGraphErrors=makeTGraphErrors(XYvecs,theOptions);
 
 	std::vector<double> Xvec_2=getData_vector(allData_f1,0,-1);//X, Y (start with -1)
@@ -277,9 +305,35 @@ void tb_plot_eff(){
 	std::cout<<"2\n";
 	canOpts.fill_TGEs(allXYvecs, 0, 2);
 	std::cout<<"3\n";
+	*/
 	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);
-	putGraphsOnCanvas(c1, canOpts.legend, canOpts.TGEs, canOpts.TPads[1], 0, 2);
+	std::vector<TEfficiency*> allTEffs={};
+	for(int i=0;i<1;i++){
+	//for(int i=0;i<inF_names.size();i++){
+		//TEfficiency* pEff = new TEfficiency("eff","different confidence levels;x;#epsilon",20,0,10);
+		TString fullPath=canOpts.inputFolder+inF_names[i].Data();
+		TFile* aTFile=TFile::Open(fullPath);
+		std::cout<<"1\n";
+		TEfficiency* pEff = (TEfficiency*)aTFile->Get(effPath);
+		std::cout<<"2\n";
+		//TEfficiency* newTEff=new TEfficiency(*pEff);
+		TH1* clone = pEff->GetCopyTotalHisto();
+		std::cout<<"3\n";
+		TCanvas *c_clone = new TCanvas();
+		clone->Draw();
+		c_clone->Print("hist.png");
+		//allTEffs.push_back(newTEff);
+		//newTEff->Print();
+		std::cout<<"4\n";
+		aTFile->Close();
+	}
+	/*
+	for(int i=0;i<inF_names.size();i++){
+		allTEffs[i].Draw();
+	}
+	//putGraphsOnCanvas(c1, canOpts.legend, canOpts.TGEs, canOpts.TPads[1], 0, 2);
 	saveCan(c1, canOpts);
 	//theTGraphErrors->Draw();
 	//printVector(effAndUnc,"effAndUnc: ");
+	*/
 }
