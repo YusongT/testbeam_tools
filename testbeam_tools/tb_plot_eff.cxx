@@ -240,8 +240,9 @@ void tb_plot_eff(){
 
 
 	//canOpts.inputFolder="/Users/ytian/code/output_tb/";
-	canOpts.inputFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-8/";
-	canOpts.outputFolder="./output_tb/";
+	canOpts.inputFolder="/eos/user/t/tiany/testbeam/tb_2022-11_2023-7/analysis_2022-11_2023-7/";
+	//canOpts.inputFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-8/";
+	canOpts.outputFolder="./output/";
 	std::vector<TString> inF_names={
         "analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
         "analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
