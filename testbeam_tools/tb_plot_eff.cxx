@@ -43,12 +43,10 @@ std::vector<std::vector<double>> parser_eff_tb(std::vector<std::string> theData)
 }
 
 
-TGraphAsymmErrors* makeTGasymm(std::vector<double> Xvec, std::vector<std::string> effAndUnc, std::string g_name){
+TGraphAsymmErrors* makeTGAsymm(std::vector<double> Xvec, std::vector<std::vector<double>> YandUncs, std::string g_name){
 	TGraphAsymmErrors* gr = new TGraphAsymmErrors;
-	std::vector<std::vector<double>> YandUncs=parser_eff_tb(effAndUnc);
 	printVectorVector(YandUncs);
 	int n=Xvec.size();
-	//gr=TGraphAsymmErrors(n,Xvec,YandUncs[0],eyl,eyh);
 	for (int j=0;j<n;j++){
 		gr->SetPoint(j,Xvec[j],YandUncs[0][j]);
 		gr->SetPointEYhigh(j,YandUncs[1][j]);
@@ -153,6 +151,45 @@ void tb_plot_eff(){
 		std::cout<<"2\n";
 		std::cout<<"eff: "<<eff<<"+"<<unc_u=p<<"-"<<unc_l<<"\n";
 	}
+
+	/*
+	std::vector<double> eyl;
+	std::vector<double> eyh;
+
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10_2023-1_thres.txt");
+	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
+	std::vector<std::string> effAndUnc=get1row(allData_f1,4,0);
+	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_thres_minH6.txt");
+	std::vector<double> Xvec2=getData_vector(allData_f1,1,0);
+	std::vector<std::string> effAndUnc2=get1row(allData_f1,3,0);
+	printVector(Xvec,"Xvec: ");
+	printVector(Xvec2,"Xvec2: ");
+	printVector(effAndUnc,"effAndUnc: ");
+	printVector(effAndUnc2,"effAndUnc2: ");
+
+	std::vector<TGraphAsymmErrors*> allTGasymms;
+	int i=0;
+
+	std::vector<std::vector<double>> YandUncs2=parser_eff_tb(effAndUnc2);
+	allTGasymms.push_back(makeTGAsymm(Xvec2, YandUncs2, "SCC4"));
+	canLeg->AddEntry(allTGasymms[i],"SCC4","p same");
+
+	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
+	allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
+	allTGasymms[i]->GetXaxis()->SetTitle("Threshold [e]");
+	allTGasymms[i]->GetYaxis()->SetTitle("Efficiency [%]");
+	allTGasymms[i]->Draw("LP SAME");//RX reverses x axis
+	
+	i=1;
+	std::vector<std::vector<double>> YandUncs=parser_eff_tb(effAndUnc);
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "min_hits_on_track=5"));
+	canLeg->AddEntry(allTGasymms[i],"min_hits_on_track=5","p SAME");
+
+	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
+	allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
+	allTGasymms[i]->Draw("LP SAME");//RX reverses x axis
+	*/
+
 	//myChain->Print();
 	//multiple of these, each to a file:
 	//******************************************************************************
@@ -221,9 +258,6 @@ void tb_plot_eff(){
 	//auto c1 = new TCanvas("c1","A Simple Graph with asymmetric error bars",200,10,700,500);
 	//c1->SetGrid();
 
-	std::vector<double> eyl;
-	std::vector<double> eyh;
-
 	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10_2023-1_thres.txt");
 	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
 	std::vector<std::string> effAndUnc=get1row(allData_f1,4,0);
@@ -238,7 +272,7 @@ void tb_plot_eff(){
 	std::vector<TGraphAsymmErrors*> allTGasymms;
 	int i=0;
 
-	allTGasymms.push_back(makeTGasymm(Xvec2, effAndUnc2, "SCC4"));
+	allTGasymms.push_back(makeTGAsymm(Xvec2, effAndUnc2, "SCC4"));
 	canLeg->AddEntry(allTGasymms[i],"SCC4","p same");
 
 	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
@@ -248,7 +282,7 @@ void tb_plot_eff(){
 	allTGasymms[i]->Draw("LP SAME");//RX reverses x axis
 	
 	i=1;
-	allTGasymms.push_back(makeTGasymm(Xvec, effAndUnc, "min_hits_on_track=5"));
+	allTGasymms.push_back(makeTGAsymm(Xvec, effAndUnc, "min_hits_on_track=5"));
 	canLeg->AddEntry(allTGasymms[i],"min_hits_on_track=5","p SAME");
 
 	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
@@ -283,7 +317,7 @@ void tb_plot_eff(){
 	std::vector<TGraphAsymmErrors*> allTGasymms;
 	int i=0;
 
-	allTGasymms.push_back(makeTGasymm(Xvec2, effAndUnc2, "SCC4"));
+	allTGasymms.push_back(makeTGAsymm(Xvec2, effAndUnc2, "SCC4"));
 	canLeg->AddEntry(allTGasymms[i],"SCC4","p same");
 
 	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
@@ -294,9 +328,9 @@ void tb_plot_eff(){
 	//aGraph=makeTGraphErrors(XYvec,gOptions)
 	
 	i=1;
-	allTGasymms.push_back(makeTGasymm(Xvec, effAndUnc, "SCC4_wo_mask"));
+	allTGasymms.push_back(makeTGAsymm(Xvec, effAndUnc, "SCC4_wo_mask"));
 	canLeg->AddEntry(allTGasymms[i],"SCC4_wo_mask","p SAME");
-	//allTGasymms.push_back(makeTGasymm(Xvec2, effAndUnc2, "SCC4_with_mask"));
+	//allTGasymms.push_back(makeTGAsymm(Xvec2, effAndUnc2, "SCC4_with_mask"));
 	//canLeg->AddEntry(allTGasymms[i],"SCC4_with_mask","lp SAME");
 
 	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
@@ -329,7 +363,7 @@ void tb_plot_eff(){
 	std::vector<TGraphAsymmErrors*> allTGasymms;
 	int i=0;
 
-	allTGasymms.push_back(makeTGasymm(Xvec, effAndUnc, "Q9"));
+	allTGasymms.push_back(makeTGAsymm(Xvec, effAndUnc, "Q9"));
 	canLeg->AddEntry(allTGasymms[i],"Q9","p same");
 
 	allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
