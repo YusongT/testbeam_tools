@@ -279,51 +279,61 @@ void tb_plot_eff(){
 
 	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);
 
+	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	//TChain myChain(folderInRoot);
 	//std::vector<float>* var_eff=0;
 	//TBranch* br_eff=0;
-	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
-	TChain myChain(folderInRoot);
 	//myChain.SetBranchAddress("eTotalEfficiency",&var_eff,&br_eff);
-	int tot_files=myChain.GetEntries();
+	//int tot_files=myChain.GetEntries();
 	for(int i=0;i<3;i++){
 		TString fullPath=canOpts.inputFolder+inF_names[i].Data();
-		myChain.AddFile(fullPath);
-		//TFile* aTFile=TFile::Open(fullPath);
+		//myChain.AddFile(fullPath);
+		TFile* aTFile=TFile::Open(fullPath);
+		TEfficiency* p_TEff = new TEfficiency();
+		p_TEff=(TEfficiency*)aTFile->Get(folderInRoot);
+		double eff=0; double unc_l=0; double unc_u=0;
+		std::cout<<"1\n";
+		//Int_t global_bin=p_TEff->GetGlobalBin(0, 2);
+		//std::cout<<"global_bin: "<<global_bin<<"\n";//0 but when use 0 eff=0
+		oneEff=p_TEff->GetEfficiency(1);
+		unc_l=p_TEff->GetEfficiencyErrorLow(1);
+		unc_u=p_TEff->GetEfficiencyErrorUp(1);
+		std::cout<<"2\n";
+		std::cout<<"eff: "<<eff<<"+"<<unc_u=p<<"-"<<unc_l<<"\n";
 	}
 	//myChain->Print();
 	//multiple of these, each to a file:
 	//******************************************************************************
 	//*Chain   :AnalysisITkPixQuad/plane110;1/eTotalEfficiency: /Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-8/analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root *
 	//******************************************************************************
+	/*
 	std::vector<TEfficiency*> allTEffs={};
-	TEfficiency* pEff = new TEfficiency();
 	//("eff","different confidence levels;x;#epsilon",20,0,10);
-	double oneEff=0;
 	for(int i=0;i<1;i++){
 		std::cout<<"1\n";
-		pEff=(TEfficiency*)myChain.GetTree();
+		p_TEff=(TEfficiency*)myChain.GetTree();
 		std::cout<<"2\n";
 		c1->cd();
 		std::cout<<"3\n";
-		Int_t global_bin=pEff->GetGlobalBin(0, 1);
+		//double 
 		std::cout<<"4\n";
-		oneEff=pEff->GetEfficiency(global_bin);
 		std::cout<<"5\n";
-		//pEff->Draw();
+		//p_TEff->Draw();
+	}
+	*/
 	/*
-		TEfficiency* pEff = (TEfficiency*)br_eff;
-		//TEfficiency* pEff = (TEfficiency*)aTFile->Get(effPath);
-		//TEfficiency* newTEff=new TEfficiency(*pEff);
-		TH1* clone = pEff->GetCopyTotalHisto();
+		TEfficiency* p_TEff = (TEfficiency*)br_eff;
+		//TEfficiency* p_TEff = (TEfficiency*)aTFile->Get(effPath);
+		//TEfficiency* newTEff=new TEfficiency(*p_TEff);
+		TH1* clone = p_TEff->GetCopyTotalHisto();
 		TCanvas *c_clone = new TCanvas();
 		clone->Draw();
 		c_clone->Print("hist.png");
 		//allTEffs.push_back(newTEff);
 		//newTEff->Print();
 		//aTFile->Close();
-		pEff->Print();
+		p_TEff->Print();
 	*/
-	}
 	/*
 	for(int i=0;i<inF_names.size();i++){
 		allTEffs[i].Draw();
