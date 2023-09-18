@@ -1,4 +1,5 @@
 #input run numbers as list, print string used to insert to filename
+from helperFunctions_tb import *
 
 '''
 pathPrefix="/eos/atlas/atlascerngroupdisk/pixel-upgrade/itk/BeamTest/cern_2022_april_itk_sps/native/run00"
@@ -106,19 +107,7 @@ runNumList=[
 
 pathSuffix=".raw"
 runs=[]
-# decode the 2D list with single&continuous run numbers into 1 list
-for i in range(len(runNumList)):
-	if type(runNumList[i])==list:
-		for j in range(runNumList[i][0],runNumList[i][1]+1):
-			runs.append(j)
-	else:
-		runs.append(runNumList[i])
-# print all run numbers with self-selected separation
-#sep="\n"
-sep=", "
-for aRun in runs:
-	print(str(aRun)+sep,end = '')
-print("tot # of runs:",len(runs))
+runs=expand2Dlist(runNumList)
 
 # assemble the full names with path
 final_str=""
