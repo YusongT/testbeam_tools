@@ -75,6 +75,8 @@ runNumList=[
 [7892,7898],[7900,7902],
 ]
 '''
+
+'''
 pathPrefix='/eos/atlas/atlascerngroupdisk/det-itk/general/pixels/testbeam/20221102.cern.itk/raw/run00'#2022-11 data moved here
 runNumList=[
 #120V 2ke
@@ -87,9 +89,19 @@ runNumList=[
 #[7936,7947],
 #[7790,7798],[7800,7803],
 #120V 2ke
-[7867,7875],
+#[7867,7875],
 #100V 1.5ke
 #[7878,7902],
+#20V 2ke
+[7829,7832],[7834,7836],
+#20V 2ke the rest
+[7837,7839],[7841,7842],[7844,7848],[7851,7853],[7855,7858],[7860,7861]
+]
+'''
+
+pathPrefix='/eos/atlas/atlascerngroupdisk/det-itk/general/pixels/testbeam/cern_2023_august2nd_itk/raw/run0'
+runNumList=[
+[11785, 11810],[11812,11815]
 ]
 
 pathSuffix=".raw"
@@ -102,7 +114,8 @@ for i in range(len(runNumList)):
 	else:
 		runs.append(runNumList[i])
 # print all run numbers with self-selected separation
-sep="\n"
+#sep="\n"
+sep=", "
 for aRun in runs:
 	print(str(aRun)+sep,end = '')
 print("tot # of runs:",len(runs))
