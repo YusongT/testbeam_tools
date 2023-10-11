@@ -47,7 +47,7 @@ std::vector<std::vector<double>> tb_getYandUncs(std::vector<TString> inF_names, 
 	std::vector<std::vector<double>> YandUncs={{},{},{}};
 	for(int i=0;i<inF_names.size();i++){
 		std::cout<<inF_names[i]<<"\n";
-		TString fullPath=canOpts.inputFolder+inF_names[i].Data();
+		TString fullPath=canOpts.inFolder+inF_names[i].Data();
 		TFile* aTFile=TFile::Open(fullPath);
 
 		TEfficiency* p_TEff = new TEfficiency();
@@ -90,14 +90,20 @@ void tb_plot_eff(){
 	canOpts.figFileName="figFileName";
 
 	canOpts.figFileFormats={"pdf"};//figure file name
-	canOpts.inputFolder="/Users/ytian/hardware/2021_testBeam/analysis/";
-	canOpts.outputFolder="./output_tb/";
+	canOpts.inFolder="/Users/ytian/hardware/2021_testBeam/analysis/";
+	canOpts.outFolder="./output_tb/";
 	std::vector<std::string> fileNameVec={};
 	std::vector<std::string> legNameVec={};
 	TCanvas* c1; TPad* pad0; TPad* pad1; canOpts.TPads={pad0,pad1};
 	std::vector<std::vector<std::vector<std::string>>> allData;
 	std::vector<std::vector<std::vector<double>>> allXYvecs;
 	std::vector<int> indices;
+	TLegend* canLeg=new TLegend(0.72,0.05,1.0,0.95);
+	std::vector<TGraphAsymmErrors*> allTGasymms;
+
+	canOpts.plotType="eff";
+	canOpts.markerSizes[0]=1.25; canOpts.markerSizes.push_back(1.25);
+	canOpts.marginT=0.1; canOpts.marginB=0.1; canOpts.marginL=0.13; canOpts.marginR=0.07; canOpts.xLabelSize=0.035;
 
 	canOpts.factorsX={1.}; canOpts.factorsY={1.};
 	canOpts.indexRow=0;// index of the row below which data starts
@@ -105,25 +111,158 @@ void tb_plot_eff(){
 	canOpts.indexColY=2;
 	//canOpts.indexColXunc=-1;
 	//canOpts.indexColYunc=-1;
-	canOpts.plotType="eff";
-	canOpts.markerSizes[0]=1.25; canOpts.markerSizes.push_back(1.25);
-	canOpts.marginT=0.1; canOpts.marginB=0.1; canOpts.marginL=0.13; canOpts.marginR=0.07; canOpts.xLabelSize=0.035;
+	std::vector<TString> inF_names={};
+	std::vector<double> Xvec={};
+	std::vector<std::vector<double>> YandUncs;
 
-	TLegend* canLeg=new TLegend(0.72,0.05,1.0,0.95);
-	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);
-	canOpts.TPads[0]->SetFillStyle(4000);
-	canOpts.TPads[1]->SetFillStyle(4000);
 
-	
-	//canOpts.inputFolder="/Users/ytian/code/output_tb/";
-	canOpts.inputFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-8/";
-	canOpts.outputFolder="./output_tb/";
+	//------ ------ config ------ ------
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-10/";
+	//canOpts.inFolder="/Users/ytian/code/output_tb/";
+	canOpts.outFolder="./output_tb/";
+
+	canOpts.figFileName="2023-10_eff_lv1_FEI4";
+	canOpts.setValues(10, 130, 98.9, 100, "eff_vs_V", "V", "eff [%]", "ap", 900, 600);
+	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_60V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "SCC4_ref_nolv1Cut"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-10/";
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-1to32.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-1to32.root",
+		"analysis_202211_60V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-1to32.root",
+		"analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-1to32.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-10_-1to32.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-1to32.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "lv1_-1to32"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-10/";
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_60V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_80V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "pl24ref"));
+
+
+
+	/*
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-10/";
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_FEI4alignRel3.5_-32to999.root",
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_FEI4alignRel3.5_-32to999.root",
+	};
+	Xvec={19.5,21};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "20V_rel3.5"));//very slightly less
+	*/
+
+	/*
+	canOpts.figFileName="2023-10_eff_furtherAlignment";
+	canOpts.setValues(10, 130, 98.9, 100, "eff_vs_V", "V", "eff [%]", "ap", 900, 600);
+	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_60V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "FurtherAlign"));
+
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_ChristopherAlignment_-32to999.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_ChristopherAlignment_-32to999.root",
+		"analysis_202211_60V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_ChristopherAlignment_-32to999.root",
+		"analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_ChristopherAlignment_-32to999.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-10_ChristopherAlignment_-32to999.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_ChristopherAlignment_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "BeforeFurtherAlign"));
+
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-8/";
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29.root",
+		"analysis_202211_60V2ke_4Dabs100100_pl130None_minH7_2023-7-29.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-7-29.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_lv1_-1to999.root"
+	};
+	Xvec={20,40,60,100,120};
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "FurtherAlign_2023-8"));
+
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
+		"analysis_202211_60V2ke_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
+		//"analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",//not cut off
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root"
+	};
+	Xvec={20,40,60,100};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "BeforeFurtherAlign_2023-8"));
+	*/
+
+
+
+	// plot 2023-8
+	/*
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-8/";
+	//canOpts.inFolder="/Users/ytian/code/output_tb/";
+	canOpts.outFolder="./output_tb/";
 	canOpts.setValues(10, 130, 98.9, 100, "eff_vs_V", "V", "eff [%]", "ap", 900, 600);
 	canOpts.figFileName="2023-7_eff_comparison";
-	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);//, "ALP RX");//causes grid exeed top
-	TGE theOptions;//theOptions.colour=1;theOptions.markerSize=1;theOptions.lineWidth=1
 	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
-	std::vector<TGraphAsymmErrors*> allTGasymms;
 
 	std::vector<TString> inF_names={
 		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_ChristopherAlignment.root",
@@ -179,6 +318,7 @@ void tb_plot_eff(){
 	printVectorVector(YandUncs,"YandUncs: ");
 	printVector(Xvec,"Xvec: ");
 	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "lv1_-32to999"));
+	*/
 
 	/*
 	inF_names={
@@ -192,6 +332,8 @@ void tb_plot_eff(){
 
 	inF_names={
 		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_lv1_-1to400.root",
+		//"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_lv1_-32to1.root";
+		//"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_lv1_-32to400.root";
 	};
 	Xvec={120};
 	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
@@ -199,37 +341,29 @@ void tb_plot_eff(){
 	printVector(Xvec,"Xvec: ");
 	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "lv1_-1to400"));
 	*/
-	std::vector<TString> legTexts={
-		"BeforeMoreAlign",
-		"MoreAlign",
-		"Ref_FEI4",
-		"lv1_-32to999",
-		//"lv1_-1to32",
-		//"lv1_-1to400",
-	};
-	/*
-		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_lv1_-32to1.root";
-		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-7-29_lv1_-32to400.root";
-	*/
+
+
+	//------ ------ plot ------ ------
+	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);//, "ALP RX");//causes grid exeed top
+	canOpts.TPads[0]->SetFillStyle(4000);
+	canOpts.TPads[1]->SetFillStyle(4000);
 	for (int i=0;i<allTGasymms.size();i++){
-		canLeg->AddEntry(allTGasymms[i],legTexts[i],"p same");
+		canLeg->AddEntry(allTGasymms[i],allTGasymms[i]->GetTitle(),"p same");
 		allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
 		allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
-		allTGasymms[i]->GetXaxis()->SetTitle("Threshold [e]");
-		allTGasymms[i]->GetYaxis()->SetTitle("Efficiency [%]");
+		allTGasymms[i]->GetXaxis()->SetTitle(canOpts.Xaxis);
+		allTGasymms[i]->GetYaxis()->SetTitle(canOpts.Yaxis);
 		allTGasymms[i]->Draw("LP SAME");//RX reverses x axis
 	}
 	drawLegend(c1, canLeg, canOpts.TPads[0]);
-	//c1->Print("./2023-1_eff_SCC4_vsThres.pdf");
-	//c1->Print(canOpts.figFileName+".pdf");
 	saveCan(c1, canOpts);
 
 	/*
 	std::vector<double> eyl;
 	std::vector<double> eyh;
 
-	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10_2023-1_thres.txt");
-	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_thres_minH6.txt");
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inFolder+"result_2022-10_2023-1_thres.txt");
+	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inFolder+"result_2022-10_thres_minH6.txt");
 
 	
 	i=1;
@@ -293,10 +427,10 @@ void tb_plot_eff(){
 	//auto c1 = new TCanvas("c1","A Simple Graph with asymmetric error bars",200,10,700,500);
 	//c1->SetGrid();
 
-	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10_2023-1_thres.txt");
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inFolder+"result_2022-10_2023-1_thres.txt");
 	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
 	std::vector<std::string> effAndUnc=get1row(allData_f1,4,0);
-	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_thres_minH6.txt");
+	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inFolder+"result_2022-10_thres_minH6.txt");
 	std::vector<double> Xvec2=getData_vector(allData_f1,1,0);
 	std::vector<std::string> effAndUnc2=get1row(allData_f1,3,0);
 	printVector(Xvec,"Xvec: ");
@@ -335,13 +469,13 @@ void tb_plot_eff(){
 	canOpts.TPads[0]->SetFillStyle(4000);
 	canOpts.TPads[1]->SetFillStyle(4000);
 	canOpts.TPads[1]->SetGrid(0,0);
-	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-10.txt");
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inFolder+"result_2022-10.txt");
 	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
 	std::vector<std::string> effAndUnc=get1row(allData_f1,2,0);
-	//std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2022-10_alighWmask_analysisWmask.txt");
+	//std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inFolder+"result_2022-10_alighWmask_analysisWmask.txt");
 	//std::vector<double> Xvec2=getData_vector(allData_f2,1,0);
 	//std::vector<std::string> effAndUnc2=get1row(allData_f2,2,0);
-	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inputFolder+"result_2023-1_Nov2022_SCC4_mask97runs.txt");
+	std::vector<std::vector<std::string>> allData_f2=getData(canOpts.inFolder+"result_2023-1_Nov2022_SCC4_mask97runs.txt");
 	std::vector<double> Xvec2=getData_vector(allData_f2,1,0);
 	std::vector<std::string> effAndUnc2=get1row(allData_f2,2,0);
 	printVector(Xvec,"Xvec: ");
@@ -379,8 +513,8 @@ void tb_plot_eff(){
 
 
 	/*
-	canOpts.inputFolder="/Users/ytian/hardware/2021_testBeam/tb_2023/";
-	canOpts.outputFolder="./output_tb/";
+	canOpts.inFolder="/Users/ytian/hardware/2021_testBeam/tb_2023/";
+	canOpts.outFolder="./output_tb/";
 
 	canOpts.setValues(0.5, -120.5, 98, 100, "eff_vs_V", "Voltage [V]", "Efficiency [%]", "ap", 900, 600);
 	canOpts.figFileName="2023-5_eff_Q9_refPl130";
@@ -389,7 +523,7 @@ void tb_plot_eff(){
 	canOpts.TPads[0]->SetFillStyle(4000);
 	canOpts.TPads[1]->SetFillStyle(4000);
 	canOpts.TPads[1]->SetGrid(0,0);
-	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inputFolder+"result_2022-11.txt");
+	std::vector<std::vector<std::string>> allData_f1=getData(canOpts.inFolder+"result_2022-11.txt");
 	std::vector<double> Xvec=getData_vector(allData_f1,1,0);
 	std::vector<std::string> effAndUnc=get1row(allData_f1,3,0);
 	printVector(Xvec,"Xvec: ");
