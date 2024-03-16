@@ -99,11 +99,13 @@ void tb_plot_eff(){
 	std::vector<std::vector<std::vector<double>>> allXYvecs;
 	std::vector<int> indices;
 	TLegend* canLeg=new TLegend(0.72,0.05,1.0,0.95);
+	std::vector<double> legendPos={0.72,0.05,1.0,0.95};
 	std::vector<TGraphAsymmErrors*> allTGasymms;
 
 	canOpts.plotType="eff";
 	canOpts.markerSizes[0]=1.25; canOpts.markerSizes.push_back(1.25);
 	canOpts.marginT=0.1; canOpts.marginB=0.1; canOpts.marginL=0.13; canOpts.marginR=0.07; canOpts.xLabelSize=0.035;
+	canOpts.axisOffsets={1.05,1.2,1.1};//x, y, z. z so far not used
 
 	canOpts.factorsX={1.}; canOpts.factorsY={1.};
 	canOpts.indexRow=0;// index of the row below which data starts
@@ -121,10 +123,321 @@ void tb_plot_eff(){
 	//canOpts.inFolder="/Users/ytian/code/output_tb/";
 	canOpts.outFolder="./output_tb/";
 
-	canOpts.figFileName="2023-10_eff_lv1_FEI4";
-	canOpts.setValues(10, 130, 98.9, 100, "eff_vs_V", "V", "eff [%]", "ap", 900, 600);
+
+
+
+	/*
+	canOpts.figFileName="2023-9_2023-11_eff_singleRuns_differentROI_2023-11-22";
+	canOpts.setValues(15239, 15261, 50, 100, "eff_vs_run", "run#", "eff [%]", "ap", 900, 600);
+	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_singleRuns_differentROI_2023-11-22/";
+	folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_run15240_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15241_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15242_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15243_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15244_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15245_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15246_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15247_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15248_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15251_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15252_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15253_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15254_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15255_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15256_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15257_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15258_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15259_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15260_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_2023-11-22_-32to999.root"
+	};
+	Xvec={15240,15241,15242,15243,15244,15245,15246,15247,15248,15251, 15252, 15253, 15254, 15255, 15256, 15257, 15258, 15259, 15260};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q16(pl110)_pl24ref"));
+	*/
+
+
+
+
+	/*
+	canOpts.figFileName="2023-9_2023-11_eff_runs_differentROI";
+	canOpts.setValues(15239, 15261, 50, 100, "eff_vs_run", "V", "eff [%]", "ap", 900, 600);
+	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_singleRuns_differentROI/";
+	folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_run15240_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15241_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15242_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15243_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15244_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15245_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15246_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15247_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15248_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15251_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15252_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15253_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15260_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10diffROI_-32to999.root"
+	};
+	Xvec={15240,15241,15242,15243,15244,15245,15246,15247,15248,15251,15252,15253,15260};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q16(pl110)_pl24ref"));
+	*/
+
+
+	/*
+	canOpts.figFileName="2023-9_2023-11_eff_singleRuns";
+	canOpts.setValues(15239, 15261, 50, 100, "eff_vs_run", "V", "eff [%]", "ap", 900, 600);
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_singleRuns/";
+	folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_run15240_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		//"analysis_2023-9_15240-15260_noMask_run15241_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		//"analysis_2023-9_15240-15260_noMask_run15242_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15243_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15244_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15245_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15246_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15247_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15248_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_run15260_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+	};
+	Xvec={15240,15241,15242,15243,15244,15245,15246,15247,15248,15260};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q16(pl110)_pl24ref"));
+	*/
+
+	/*
+	canOpts.figFileName="2023-9_2023-11_eff_allComparisons";
+	canOpts.setValues(250, 650, 50, 100, "eff_vs_V", "V", "eff [%]", "ap", 900, 600);
 	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
 
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane131/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+	};
+	Xvec={300,400,500};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q11(pl131)_pl24ref"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane131/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root",
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root"
+	};
+	Xvec={300,400,500};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q11(pl131)_pl24ref_lv1_0to33"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane131/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+	};
+	Xvec={300,400,500};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q11(pl131)_pl24ref_previousAlign"));
+
+
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane132/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+	};
+	Xvec={300,400,500};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q13(pl132)_pl24ref"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane132/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root",
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root"
+	};
+	Xvec={300,400,500};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q13(pl132)_pl24ref_lv1_0to33"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane132/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+	};
+	Xvec={300,400,500};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q13(pl132)_pl24ref_previousAlign"));
+
+
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_-32to999.root",
+	};
+	Xvec={400,500,600};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q16(pl110)_pl24ref"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root",
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH10_0to33.root",
+	};
+	Xvec={400,500,600};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q16(pl110)_pl24ref_lv1_0to33"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2023-9_analysis/analysis_2023-11/";
+	folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	inF_names={
+		"analysis_2023-9_15273-15299_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+		"analysis_2023-9_15240-15260_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+		"analysis_2023-9_15179-15200_noMask_4Dabs100100_pl24None_minH7_2023-11_ChristopherAlignment_-32to999.root",
+	};
+	Xvec={400,500,600};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "Q16(pl110)_pl24ref_previousAlign"));
+	*/
+
+
+
+	canOpts.figFileName="2023-11_eff_FEI4_withAndwoMask_newLegend";
+	canOpts.setValues(10, 130, 98.5, 100, "eff_vs_V", "Bias voltage [V]", "Efficiency [%]", "ap", 800, 600);
+	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+	canOpts.colours={kBlack, kRed, kBlue, kCyan, kGreen, kOrange, kOrange-3, kMagenta, kViolet+6, kSpring-6, kAzure-6, kOrange-7, kOrange+3};
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-10/";
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_60V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_80V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "ref_SCC4"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-10/";
+	inF_names={
+		"analysis_202211_20V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_40V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_60V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_80V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_100V2ke_f20_7913_7934_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+		"analysis_202211_120V2ke_f20_4Dabs100100_pl24None_minH7_2023-10_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "ref_FEI4"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-11_noMask/";
+	inF_names={
+		"analysis_202211_20V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_40V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_60V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_80V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_100V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH8_-32to999.root",
+		"analysis_202211_120V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "ref_SCC4_noMask"));//new align
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-11_noMask/";
+	inF_names={
+		"analysis_202211_20V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_40V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_60V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_80V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_100V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH8_-32to999.root",
+		"analysis_202211_120V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root"
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "ref_FEI4_noMask"));// new align
+
+	//allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "ref_SCC4_noMask_lessAlign"));
+
+	legendPos={0.65,0.1,0.95,0.5};//x1, y1, x2, y2
+
+
+
+	/*
+	canOpts.figFileName="2023-11_eff_lv1_FEI4_withAndwoMask";
+	canOpts.setValues(10, 130, 98.5, 100, "eff_vs_V", "V", "eff [%]", "ap", 900, 600);
+	TString folderInRoot="AnalysisITkPixQuad/plane110/eTotalEfficiency";
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-10/";
 	inF_names={
 		"analysis_202211_20V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
 		"analysis_202211_40V2ke_f20_4Dabs100100_pl130None_minH7_2023-10_-32to999.root",
@@ -172,6 +485,55 @@ void tb_plot_eff(){
 	printVector(Xvec,"Xvec: ");
 	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "pl24ref"));
 
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-11_noMask/";
+	inF_names={
+		"analysis_202211_20V2ke_noMask_4Dabs100100_pl130None_minH7_2023-10alignment_DUTalignMinH9_-32to999.root",
+		"analysis_202211_40V2ke_noMask_4Dabs100100_pl130None_minH7_2023-10alignment_DUTalignMinH9_-32to999.root",
+		"analysis_202211_60V2ke_noMask_4Dabs100100_pl130None_minH7_2023-10alignment_DUTalignMinH9_-32to999.root",
+		"analysis_202211_80V2ke_noMask_4Dabs100100_pl130None_minH7_2023-10alignment_DUTalignMinH9_-32to999.root",
+		//"analysis_202211_100V2ke_noMask_4Dabs100100_pl130None_minH7_2023-10alignment_DUTalignMinH8_-32to999.root",
+		"analysis_202211_120V2ke_noMask_4Dabs100100_pl130None_minH7_2023-10alignment_DUTalignMinH9_-32to999.root"
+
+	};
+	Xvec={20,40,60,80,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "no_mask_previousAlign"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-11_noMask/";
+	inF_names={
+		"analysis_202211_20V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_40V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_60V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_80V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_100V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH8_-32to999.root",
+		"analysis_202211_120V2ke_noMask_4Dabs100100_pl130None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "no_mask_newAlign"));
+
+	canOpts.inFolder="/Users/ytian/hardware/tb/2022-11_analysis_2023-7/analysis_2023-11_noMask/";
+	inF_names={
+		"analysis_202211_20V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_40V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_60V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_80V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root",
+		"analysis_202211_100V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH8_-32to999.root",
+		"analysis_202211_120V2ke_noMask_4Dabs100100_pl24None_minH7_2023-11_DUTalignMinH9_-32to999.root"
+	};
+	Xvec={20,40,60,80,100,120};
+	YandUncs;
+	YandUncs=tb_getYandUncs(inF_names, canOpts, folderInRoot);
+	printVectorVector(YandUncs,"YandUncs: ");
+	printVector(Xvec,"Xvec: ");
+	allTGasymms.push_back(makeTGAsymm(Xvec, YandUncs, "no_mask_newAlign_pl24"));
+	*/
 
 
 	/*
@@ -344,18 +706,21 @@ void tb_plot_eff(){
 
 
 	//------ ------ plot ------ ------
-	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);//, "ALP RX");//causes grid exeed top
+	//c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1]);//, "ALP RX");//causes grid exeed top
+	c1=initCan(canOpts, canOpts.TPads[0], canOpts.TPads[1], "ap", "1");//, "ALP RX");//causes grid exeed top
 	canOpts.TPads[0]->SetFillStyle(4000);
 	canOpts.TPads[1]->SetFillStyle(4000);
+	canOpts.legend=new TLegend(legendPos[0],legendPos[1],legendPos[2],legendPos[3]);
 	for (int i=0;i<allTGasymms.size();i++){
-		canLeg->AddEntry(allTGasymms[i],allTGasymms[i]->GetTitle(),"p same");
+		canOpts.legend->AddEntry(allTGasymms[i],allTGasymms[i]->GetTitle(),"p same");
 		allTGasymms[i]->SetMarkerColor(canOpts.colours[i]);
 		allTGasymms[i]->SetMarkerStyle(canOpts.markers[i]);
 		allTGasymms[i]->GetXaxis()->SetTitle(canOpts.Xaxis);
 		allTGasymms[i]->GetYaxis()->SetTitle(canOpts.Yaxis);
 		allTGasymms[i]->Draw("LP SAME");//RX reverses x axis
 	}
-	drawLegend(c1, canLeg, canOpts.TPads[0]);
+	drawLegend(c1, canOpts.legend, canOpts.TPads[1]);
+	//drawLegend(c1, canLeg, canOpts.TPads[0]);
 	saveCan(c1, canOpts);
 
 	/*
